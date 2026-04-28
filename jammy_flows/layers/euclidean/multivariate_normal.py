@@ -21,38 +21,7 @@ import pylab
 def generate_log_function_bounded_in_logspace(min_val_normal_space=1, max_val_normal_space=10, center=False, clamp=False, min_clamp_value=None, max_clamp_value=None):
     
     ## min and max values are in normal space -> must be positive
-    assert(min_val_normal_space > 0)
-
-    ln_max=numpy.log(max_val_normal_space)
-    ln_min=numpy.log(min_val_normal_space)
-
-    ## this shift makes the function equivalent to a normal exponential for small values
-    center_val=ln_max
-
-    ## can also center around zero (it will be centered in exp space, not in log space)
-    if(center==False):
-        center_val=0.0
-
-
-
-    if(clamp):
-        def f(x):
-
-            res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-torch.clamp(x, min=min_clamp_value, max=max_clamp_value)+center_val).unsqueeze(-1)], dim=-1)
-
-            first_term=ln_max-torch.logsumexp(res, dim=-1, keepdim=True)
-
-            return torch.logsumexp( torch.cat([first_term, torch.ones_like(first_term)*ln_min], dim=-1), dim=-1)
-    else:
-        def f(x):
-
-            res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-x+center_val).unsqueeze(-1)], dim=-1)
-
-            first_term=ln_max-torch.logsumexp(res, dim=-1, keepdim=True)
-
-            return torch.logsumexp( torch.cat([first_term, torch.ones_like(first_term)*ln_min], dim=-1), dim=-1)
-
-    return f
+    pass
 
 
 class mvn_block(euclidean_base.euclidean_base):
@@ -315,53 +284,5 @@ class mvn_block(euclidean_base.euclidean_base):
         """ 
         Debugging function that puts current flow parameters along with their name into "param_dict".
         """
-
-        single_diagonal=None
-        full_diagonal=None
-        lower_triangular_entries=None
-
-        if(self.cov_type=="identity"):
-            return 
-
-        if(extra_inputs is not None):
-            extra_counter=0
-            if(self.cov_type=="diagonal_symmetric"):
-
-                single_diagonal=extra_inputs
-                param_dict[extra_prefix+"log_diagonal_symmetric"]=single_diagonal.data
-
-            elif(self.cov_type=="diagonal"):
-
-                full_diagonal=extra_inputs
-                param_dict[extra_prefix+"log_diagonal"]=full_diagonal.data
-
-            elif(self.cov_type=="full"):
-
-                full_diagonal=extra_inputs[:, :self.dimension]
-
-                param_dict[extra_prefix+"log_diagonal"]=full_diagonal.data
-
-                lower_triangular_entries=extra_inputs[:,self.dimension:]
-
-                param_dict[extra_prefix+"lower_trinagular_entries"]=lower_triangular_entries.data
-        else:
-
-            if(self.cov_type=="diagonal_symmetric"):
-
-                single_diagonal=self.single_diagonal_log
-                param_dict[extra_prefix+"log_diagonal_symmetric"]=single_diagonal.data
-
-            elif(self.cov_type=="diagonal"):
-
-                full_diagonal=self.full_diagonal_log
-                param_dict[extra_prefix+"log_diagonal"]=full_diagonal.data
-
-            elif(self.cov_type=="full"):
-
-                full_diagonal=self.full_diagonal_log
-                param_dict[extra_prefix+"log_diagonal"]=full_diagonal.data
-
-                lower_triangular_entries=self.lower_triangular_entries
-
-                param_dict[extra_prefix+"lower_trinagular_entries"]=lower_triangular_entries.data
+        pass
 

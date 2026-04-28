@@ -24,19 +24,7 @@ import torch.autograd
 
 def find_parameters(module):
 
-    assert isinstance(module, nn.Module)
-
-    # If called within DataParallel, parameters won't appear in module.parameters().
-    if getattr(module, '_is_replica', False):
-
-        def find_tensor_attributes(module):
-            tuples = [(k, v) for k, v in module.__dict__.items() if torch.is_tensor(v) and v.requires_grad]
-            return tuples
-
-        gen = module._named_members(get_members_fn=find_tensor_attributes)
-        return [param for _, param in gen]
-    else:
-        return list(module.parameters())
+    pass
 
 sphere = Sphere()
 
@@ -48,13 +36,7 @@ def divergence_bf(dx, y, **unused_kwargs):
 
 
 def create_network(input_size, output_size, hidden_size, n_hidden):
-    print("creating network with hidden size ", hidden_size, " and num hidden ", n_hidden)
-    net = [nn.Linear(input_size, hidden_size)]
-    for _ in range(n_hidden):
-        net += [nn.Tanh(), nn.Linear(hidden_size, hidden_size)]
-    net += [nn.Tanh(), nn.Linear(hidden_size, output_size)]
-
-    return nn.Sequential(*net)
+    pass
 
     #return MultiInputSequential(*net)
 
@@ -81,10 +63,10 @@ class ODEfunc(nn.Module):
         self.register_buffer("_num_evals", torch.tensor(0.))
 
     def before_odeint(self, e=None):
-        self._num_evals.fill_(0)
+        pass
 
     def num_evals(self):
-        return self._num_evals.item()
+        pass
 
     def forward(self, t, states):
         assert len(states) >= 2
@@ -216,10 +198,7 @@ class cnf_sphere_charts(sphere_base.sphere_base):
         self.func = AmbientProjNN(TimeNetwork(self.cnf_network))
 
     def set_variables_from_parent(self, parent):
-        if(self.use_permanent_parameters == False):
-            self.variables=find_parameters(parent)
-        else:
-            self.variables=None
+        pass
  
     def _forward(self, z, reverse=False, charts=4, extra_inputs=None):
         integration_times = torch.tensor(

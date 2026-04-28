@@ -14,19 +14,7 @@ normal_dist=tdist.Normal(0, 1)
 
 def obtain_bounded_variable_fn(min_val=0, max_val=1):
 
-    difference=max_val-min_val
-
-    log_difference=numpy.log(difference)
-
-    def fn(x):
-
-        res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-x).unsqueeze(-1)], dim=-1)
-
-        result=torch.exp(log_difference-torch.logsumexp(res, dim=-1))+min_val
-
-        return result
-
-    return fn
+    pass
 
 class psf_block(euclidean_base.euclidean_base):
     def __init__(self, 
@@ -376,56 +364,7 @@ class psf_block(euclidean_base.euclidean_base):
 
     def _obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 
 
-        extra_input_counter=0
-
-        if self.use_householder:
-            this_vs=self.vs
-
-            if(extra_inputs is not None):
-                
-
-                this_vs=extra_inputs[:,:self.num_householder_params]
-
-                
-                extra_input_counter+=self.num_householder_params
-
-
-            param_dict[extra_prefix+"hh_params"]=this_vs.data
-
-        log_widths1=self.log_widths1.data
-        log_widths2=self.log_widths2.data
-
-        means1=self.means1.data
-        means2=self.means2.data
-
-        log_exponent=self.log_exponent
-
-        if(extra_inputs is not None):
-          
-            log_widths1=log_widths1+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_per_item]
-            extra_input_counter+=self.num_params_per_item
-
-            log_widths2=log_widths2+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_per_item]
-            extra_input_counter+=self.num_params_per_item
-
-            means1=means1+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_per_item]
-            extra_input_counter+=self.num_params_per_item
-
-            means2=means2+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_per_item]
-            extra_input_counter+=self.num_params_per_item
-
-            log_exponent=log_exponent+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_per_item]
-            extra_input_counter+=self.num_params_per_item
-
-            ##########
-
-        param_dict[extra_prefix+"log_widths1"]=log_widths1.data
-        param_dict[extra_prefix+"log_widths2"]=log_widths2.data
-
-        param_dict[extra_prefix+"means1"]=means1.data
-        param_dict[extra_prefix+"means2"]=means2.data
-
-        param_dict[extra_prefix+"log_exponent"]=log_exponent.data
+        pass
     
 
 

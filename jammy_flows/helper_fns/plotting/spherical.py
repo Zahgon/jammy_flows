@@ -33,21 +33,7 @@ def _transform_to_world(ax_object, coords, projection_type="zen_azi"):
     """
     Does the coordinate transformation to world coordaintes given a certain projection_type
     """
-
-    if(projection_type=="zen_azi"):
-        healpy_phi_theta_coords=coords*180.0/numpy.pi
-
-        # theta
-        healpy_phi_theta_coords[:,1]=90.0-healpy_phi_theta_coords[:,0]
-
-        # phi
-        healpy_phi_theta_coords[:,0]=coords[:,1]*180.0/numpy.pi
-    else:
-        raise Exception("Unknown projection type ", projection_type)
-
-    world_coords=ax_object.wcs.all_world2pix(healpy_phi_theta_coords,1)
-
-    return world_coords
+    pass
 
 #### monkeypatching add function for more flexible ticklabels
 def add(self,
@@ -79,37 +65,7 @@ def add(self,
         data : [float, float]
             Data coordinates of the label.
         """
-       
-        required_args = ["axis", "world", "angle", "text", "axis_displacement", "data"]
-        
-        if (
-            axis is None
-            or world is None
-            or angle is None
-            or text is None
-            or axis_displacement is None
-            or data is None
-        ):
-            raise TypeError(
-                f"All of the following arguments must be provided: {required_args}"
-            )
-
-        
-        self.world[axis].append(world)
-        self.data[axis].append(data)
-        self.angle[axis].append(angle)
-       
-        num_significant=0
-        if("." in text):
-            num_significant=len(text.split(".")[-1][:-1])
-            txt_lab="%."+("%d" % num_significant)+"f°"
-            self.text[axis].append(txt_lab % (90.0-world))
-        else:
-            self.text[axis].append("%d°" % (90-world))
-
-        self.disp[axis].append(axis_displacement)
-
-        self._stale = True
+        pass
 
 if(mhealpy_installed):
     class HealpyAxesAzimuthOrdering(HealpyAxes):
@@ -181,43 +137,7 @@ if(mhealpy_installed):
                     'hh:mm:ss.s', 'd.d'
                 frame (bool): Draw plot frame  
             """
-
-            assert(zen_azi_mode=="zen_azi"), "Only supporting zen_azi mode right now"
-
-            self.grid(grid, **kwargs)
-
-            if(ticks):
-                self.coords[0].set_ticks(spacing=dmer * u.deg)
-                self.coords[1].set_ticks(spacing=dpar * u.deg)
-
-            if(show_azimuth_axis):
-                self.coords[0].set_major_formatter(tick_format)
-                self.coords[0].set_ticklabel_visible(ticks)
-                self.coords[0].set_ticklabel(color='white', size=text_size)
-
-            if(show_zenith_axis):
-                self.coords[1].set_major_formatter(tick_format)
-                self.coords[1].set_ticklabel_visible(ticks)
-                self.coords[1].set_ticklabel(color='black', size=text_size)
-
-            if frame:
-                self.coords.frame.set_linewidth(kwargs.get('linewidth', 3))
-                self.coords.frame.set_color(kwargs.get('color', 'black'))
-            else:
-                self.coords.frame.set_linewidth(0)            
-                
-            if(zen_azi_mode=="zen_azi"):
-                if(show_azimuth_axis):
-                    if(show_azimuth_label):
-                        self.coords[0].set_axislabel("azimuth [deg]", color="white") # shift the label a little to the left
-
-                if(show_zenith_axis):
-
-                    ## monkeypatching ticklabels for zenith
-                    self.coords[1].ticklabels.add = add.__get__(self.coords[1].ticklabels)
-
-                    if(show_zenith_label):
-                        self.coords[1].set_axislabel("zenith [deg]", minpad=zenith_axislabel_minpad) # shift the label a little to the left
+            pass
                     
                     
             
@@ -242,39 +162,7 @@ if(mhealpy_installed):
             Calls matplotlib.plot in world coordinates, and does an internal transformation first.
             Internally the healpy ax uses dec/ra, so have to take of that here.
             """
-            assert(len(args)>=2)
-
-            projection_type="zen_azi"
-
-            if("projection_type" in kwargs):
-                projection_type=kwargs["projection_type"]
-
-            assert(projection_type=="zen_azi"), "For now only zen_azi is supported"
-
-            x=args[0]
-            y=args[1]
-
-            new_x=x
-            new_y=y
-            if(type(x)==list):
-                new_x=numpy.array(x)
-            if(type(y)==list):
-                new_y=numpy.array(y)
-
-            assert(new_x.ndim==1)
-            assert(new_y.ndim==1)
-
-            combined_coords=numpy.concatenate([new_x[:,None], new_y[:,None]], axis=1)
-
-            world_coords=_transform_to_world(self, combined_coords, projection_type=projection_type)
-
-            further_args=args[2:]
-            
-            new_kwargs=kwargs.copy()
-            if("projection_type" in new_kwargs):
-                del new_kwargs["projection_type"]
-
-            self.plot(world_coords[:,0], world_coords[:,1], *further_args, **new_kwargs)
+            pass
 
             
     register_projection(MollviewAzimuth)
@@ -371,41 +259,7 @@ if(mhealpy_installed):
                     'hh:mm:ss.s', 'd.d'
                 frame (bool): Draw plot frame  
             """
-
-            assert(zen_azi_mode=="zen_azi"), "Only supporting zen_azi mode right now"
-
-            self.grid(grid, **kwargs)
-
-            if(ticks):
-                self.coords[0].set_ticks(spacing=dmer * u.deg)
-                self.coords[1].set_ticks(spacing=dpar * u.deg)
-
-        
-            self.coords[0].set_major_formatter(tick_format)
-            self.coords[0].set_ticklabel_visible(ticks)
-            self.coords[0].set_ticklabel(color='white', size=text_size)
-
-            if frame:
-                self.coords.frame.set_linewidth(kwargs.get('linewidth', 3))
-                self.coords.frame.set_color(kwargs.get('color', 'black'))
-            else:
-                self.coords.frame.set_linewidth(0)    
-
-           
-            self.coords[1].set_major_formatter(tick_format)
-            self.coords[1].set_ticklabel_visible(ticks)
-            self.coords[1].set_ticklabel(color='black', size=text_size)
-
-            ## monkeypatching ticklabels for zenith
-            self.coords[1].ticklabels.add = add.__get__(self.coords[1].ticklabels)
-
-            if(show_azimuth_axis):
-                if(show_azimuth_label):
-                    self.coords[0].set_axislabel("azimuth [deg]", color="white") # shift the label a little to the left
-
-            if(show_zenith_axis):
-                if(show_azimuth_label):
-                    self.coords[1].set_axislabel("zenith [deg]", minpad=zenith_axislabel_minpad) # shift the label a little to the left
+            pass
 
 
         def proj_plot(self, *args, **kwargs):
@@ -413,39 +267,7 @@ if(mhealpy_installed):
             Calls matplotlib.plot in world coordinates, and does an internal transformation first.
             Internally the healpy ax uses dec/ra, so have to take of that here.
             """
-            assert(len(args)>=2)
-
-            projection_type="zen_azi"
-
-            if("projection_type" in kwargs):
-                projection_type=kwargs["projection_type"]
-
-            assert(projection_type=="zen_azi"), "For now only zen_azi is supported"
-
-            x=args[0]
-            y=args[1]
-
-            new_x=x
-            new_y=y
-            if(type(x)==list):
-                new_x=numpy.array(x)
-            if(type(y)==list):
-                new_y=numpy.array(y)
-
-            assert(new_x.ndim==1)
-            assert(new_y.ndim==1)
-
-            combined_coords=numpy.concatenate([new_x[:,None], new_y[:,None]], axis=1)
-
-            world_coords=_transform_to_world(self, combined_coords, projection_type=projection_type)
-
-            further_args=args[2:]
-            
-            new_kwargs=kwargs.copy()
-            if("projection_type" in new_kwargs):
-                del new_kwargs["projection_type"]
-
-            self.plot(world_coords[:,0], world_coords[:,1], *further_args, **new_kwargs)
+            pass
 
     register_projection(OrthviewAzimuth)
 
@@ -578,38 +400,7 @@ def plot_multiresolution_healpy(pdf,
     using the *meander* package.
 
     """
-    assert("s2" in pdf.pdf_defs_list ), "Requires that at least one s2 sub-manifold exists."
-
-    eval_positions, _, pdf_evals, eval_areas, moc_map=get_multiresolution_evals(pdf, 
-                                                                             sub_pdf_index=sub_pdf_index,
-                                                                    samplesize=samplesize,
-                                                                    conditional_input=conditional_input,
-                                                                    max_entries_per_pixel=max_entries_per_pixel,
-                                                                    use_density_if_possible=use_density_if_possible)
-    
-    
-    ax=_plot_multiresolution_healpy(eval_positions,
-                                    pdf_evals,
-                                    eval_areas,
-                                    moc_map=moc_map,
-                                    fig=fig, 
-                                    ax_to_plot=ax_to_plot,
-                                    draw_pixels=draw_pixels,
-                                    log_scale=log_scale,
-                                    cbar=cbar,
-                                    cbar_kwargs=cbar_kwargs,
-                                    graticule=graticule,
-                                    graticule_kwargs=graticule_kwargs,
-                                    draw_contours=draw_contours,
-                                    contour_probs=contour_probs,
-                                    contour_colors=contour_colors, # None -> pick colors from color scheme
-                                    zoom=zoom,
-                                    zoom_contained_prob_mass=zoom_contained_prob_mass,
-                                    projection_type=projection_type, # zen_azi or dec_ra
-                                    declination_trafo_function=declination_trafo_function,
-                                    show_grid=show_grid) 
-
-    return ax
+    pass
 
 def _plot_multiresolution_healpy(eval_positions,
                                 pdf_evals,
@@ -638,180 +429,5 @@ def _plot_multiresolution_healpy(eval_positions,
     using the *meander* package. This function differs in that it directly takes the PDF values instead of a pdf object.
 
     """
-    
-    zoom_diameter=None
-    mean_coords=None
-
-    ## recreate moc map if necessary
-    if(moc_map is None):
-        sample_pix = mhealpy.ang2pix(mhealpy.MAX_NSIDE, eval_positions[:,0], eval_positions[:,1], nest = True)
-        moc_map = HealpixMap.moc_histogram(mhealpy.MAX_NSIDE, sample_pix, 1, nest=True)
-        assert(len(eval_positions)==moc_map.npix)
-
-    if(zoom):
-        
-        tot_sums=pdf_evals*eval_areas
-        sorta=numpy.argsort(tot_sums)[::-1] # large to small
-        ## add largest areas
-        
-        contained_mask=numpy.cumsum(tot_sums[sorta])<zoom_contained_prob_mass
-        contained_positions=eval_positions[sorta][contained_mask]
-       
-        # calculate zoom center
-
-
-        xyz_positions,_=sphere_base.sphere_base(dimension=2).spherical_to_eucl_embedding(torch.from_numpy(eval_positions), 0.0)
-        xyz_positions=xyz_positions.cpu().numpy()
-
-        
-        weighted_sum=numpy.mean(pdf_evals[:,None]*eval_areas[:,None]*xyz_positions,axis=0)
-        mean_coords=weighted_sum/numpy.sqrt(numpy.sum(weighted_sum**2))
-        mean_coords,_=sphere_base.sphere_base(dimension=2).eucl_to_spherical_embedding(torch.from_numpy(mean_coords[None,:]), 0.0)
-        mean_coords=mean_coords[0].cpu().numpy()
-
-        # calculate zoom diameter
-        zen_range=numpy.quantile(contained_positions[:,0], [0.05,0.95])
-        azi_range=numpy.quantile(contained_positions[:,1], [0.05,0.95])
-
-        # zoom can be on 2pi boundary.. make sure this is taken into account in diameter
-        if( (mean_coords[1]>=azi_range[0]) and (mean_coords[1]<=azi_range[1])):
-            azi_diff=azi_range[1]-azi_range[0]
-        else:
-            azi_diff=azi_range[0]+2*numpy.pi-azi_range[1]
-
-        zen_diff=zen_range[1]-zen_range[0]
-
-        # take larger value as approximate diameter
-        zoom_diameter=max(zen_diff, azi_diff)*2.0
-        
-    if(fig is None):
-        assert(ax_to_plot is None)
-
-        kw_dict=dict()
-
-        if(zoom):
-            kw_dict["projection"]="orthview_azimuth"
-            kw_dict["zoom_center"]=mean_coords
-            kw_dict["zoom_diameter"]=zoom_diameter
-        else:
-            kw_dict["projection"]="mollview_azimuth"
-
-        fig=pylab.figure(figsize=(8,6), dpi=200)
-        ax=fig.add_subplot(1,1,1,**kw_dict)
-    else:
-        assert(ax_to_plot is not None)
-
-        if(not isinstance(ax_to_plot, WCSAxes)):
-            single_ax=replace_axes_with_gridspec(ax_to_plot, new_layout=(1,1))
-
-            if(zoom):
-                ax=OrthviewAzimuth(fig, single_ax.get_position(), zoom_center=mean_coords, zoom_diameter=zoom_diameter)
-            else:
-                ax=MollviewAzimuth(fig, single_ax.get_position())
-
-            fig.add_axes(ax)
-            single_ax.remove() # remove original ax_to_plot
-           
-        else:
-            ax=ax_to_plot
-        
-    if(draw_pixels):
-        moc_map.density(density=True)
-        moc_map[numpy.arange(len(eval_positions))]=pdf_evals
-
-        if(log_scale):
-            img,_=moc_map.plot(ax, cbar=False, norm=LogNorm())
-        else:
-            img,_=moc_map.plot(ax, cbar=False)
-
-        if(cbar):
-
-            default_cbar_kwargs=dict()
-            default_cbar_kwargs["orientation"]="horizontal"
-            default_cbar_kwargs["pad"]=0.05
-            default_cbar_kwargs["fraction"]=0.1
-            default_cbar_kwargs["shrink"]=0.5
-            default_cbar_kwargs["aspect"]=25
-            default_cbar_kwargs["label"]=r"PDF value"
-
-            for extra_kwarg in cbar_kwargs:
-                default_cbar_kwargs[extra_kwarg]=cbar_kwargs[extra_kwarg]
-           
-            fig.colorbar(img, ax = ax, **default_cbar_kwargs)
-        
-    contours=None
-    if(draw_contours):
-        if(contour_probs is not None):
-
-            used_contour_colors=matplotlib.cm.tab10.colors
-
-            if(contour_colors is not None):
-                used_contour_colors=contour_colors
-
-            assert(len(used_contour_colors)>=len(contour_probs))
-
-            used_contour_colors=used_contour_colors[:len(contour_probs)]
-
-            ret=ContourGenerator(
-                                 ax, 
-                                 "zen_azi",
-                                       eval_positions[:,0], 
-                                       eval_positions[:,1], 
-                                       pdf_evals, 
-                                       eval_areas,
-                                       levels=contour_probs[::-1],
-                                       colors=used_contour_colors[::-1],
-                                       zorder=1
-                                       )
-            
-            
-            fmt_dict = dict()
-            for ind, cprob in enumerate(contour_probs):
-                fmt_dict[contour_probs[ind]] = "%d" % (int(cprob * 100)) + r" %"
-            
-            ax.clabel(ret,
-                    fontsize=9,
-                    inline=1,
-                    fmt=fmt_dict,
-                    levels=contour_probs[::-1],
-                    colors=used_contour_colors[::-1],
-                    zorder=1)
-          
-
-    if(graticule):
-        graticule_default_kwargs=dict()
-
-        if(zoom):
-            ## find out how many gridlines to show by default 
-            desirable_dist_between_graticules=(180.0/numpy.pi)*zoom_diameter/5.0
-            
-            target=3
-            smaller_than_target=desirable_dist_between_graticules<target
-            num_significant_points=0
-           
-            while(smaller_than_target):
-                target=target/10.0
-                num_significant_points+=1
-                smaller_than_target=desirable_dist_between_graticules<target
-                
-         
-            grat_format="d"
-            if(num_significant_points>0):
-                grat_format=grat_format+"."+"d"*num_significant_points
-
-            graticule_default_kwargs["tick_format"]=grat_format
-
-            ## max out at 60 degrees for full sky
-            graticule_default_kwargs["dmer"]=min(desirable_dist_between_graticules, 60.0)
-            graticule_default_kwargs["dpar"]=min(desirable_dist_between_graticules, 60.0)
-
-        for extra_kwarg in graticule_kwargs:
-            graticule_default_kwargs[extra_kwarg]=graticule_kwargs[extra_kwarg]
-       
-        ax.graticule(**graticule_default_kwargs)
-
-    if(show_grid):
-        moc_map.plot_grid(ax, linewidth = .1, color = 'white');
-
-    return ax
+    pass
 

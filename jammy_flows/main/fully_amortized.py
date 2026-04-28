@@ -13,11 +13,7 @@ from .. import amortizable_mlp
 from ..extra_functions import list_from_str, NONLINEARITIES
 
 def copy_attributes(objfrom, objto, names):
-    for n in names:
-        assert(hasattr(objfrom, n)), "'%s' is not an attribute of *from class*" % n
-        
-        v = getattr(objfrom, n)
-        setattr(objto, n, v)
+    pass
 
 class fully_amortized_pdf(nn.Module):
 
@@ -264,14 +260,7 @@ class fully_amortized_pdf(nn.Module):
                 int
                     Number of parameters (incl. amortization params).
         """
-
-        if(verbose):
-            print("Amoritized PDF param count: \n\
-                   target PDF pars predicted (not real): %d \n\
-                   Total PDF (MLP) pars: %d" % (self.pdf_to_amortize.total_number_amortizable_params, 
-                                                self.total_param_num))
-
-        return self.total_param_num
+        pass
 
 
 

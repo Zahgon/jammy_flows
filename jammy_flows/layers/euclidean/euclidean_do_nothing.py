@@ -45,5 +45,4 @@ class euclidean_do_nothing(euclidean_base.euclidean_base):
         """ 
         Do nothing
         """
-     
-        return
+        pass

@@ -94,12 +94,12 @@ class interval_base(layer_base.layer_base):
         return x
 
     def _embedding_conditional_return_num(self): 
-        return self.dimension
+        pass
 
     def _get_layer_base_dimension(self):
        
         
-        return self.dimension
+        pass
 
     def transform_target_space(self, x, log_det=0.0, transform_from="default", transform_to="embedding"):
         
@@ -123,7 +123,7 @@ class interval_base(layer_base.layer_base):
 
     def obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 
 
-        self._obtain_layer_param_structure(param_dict, extra_inputs=extra_inputs, previous_x=None, extra_prefix="")
+        pass
 
         #return param_dict
 

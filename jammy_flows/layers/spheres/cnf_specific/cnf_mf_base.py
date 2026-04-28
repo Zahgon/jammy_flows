@@ -44,49 +44,46 @@ class Manifold(metaclass=abc.ABCMeta):
         pass
 
     def proju0(self, u):
-        return self.proju(self.zero_like(u), u)
+        pass
 
     @abc.abstractmethod
     def projx(self, x):
         pass
 
     def egrad2rgrad(self, x, u):
-        return self.proju(x, u)
+        pass
 
     @abc.abstractmethod
     def exp(self, x, u):
         pass
 
     def exp0(self, u):
-        return self.exp(self.zero_like(u), u)
+        pass
 
     @abc.abstractmethod
     def log(self, x, y):
         pass
 
     def log0(self, y):
-        return self.log(self.zero_like(y), y)
+        pass
         
     def dist(self, x, y, squared=False, keepdim=False):
-        return self.norm(x, self.log(x, y), squared, keepdim)
+        pass
 
     def pdist(self, x, squared=False):
-        assert x.ndim == 2
-        n = x.shape[0]
-        m = torch.triu_indices(n, n, 1, device=x.device)
-        return self.dist(x[m[0]], x[m[1]], squared=squared, keepdim=False)
+        pass
 
     def transp(self, x, y, u):
-        return self.proju(y, u)
+        pass
 
     def transpfrom0(self, x, u):
-        return self.transp(self.zero_like(x), x, u)
+        pass
     
     def transpto0(self, x, u):
-        return self.transp(x, self.zero_like(x), u)
+        pass
 
     def mobius_addition(self, x, y):
-        return self.exp(x, self.transp(self.zero_like(x), x, self.log0(y)))
+        pass
 
     @abc.abstractmethod
     def sh_to_dim(self, shape):
@@ -126,10 +123,10 @@ class Manifold(metaclass=abc.ABCMeta):
             return torch.det(torch.stack(jacobians))
 
     def logdetlog(self, x, y):
-        return -self.logdetexp(x, self.log(x, y))
+        pass
 
     def logdetexp0(self, u):
-        return self.logdetexp(self.zero_like(u), u)
+        pass
     
     def logdetlog0(self, y):
-        return self.logdetlog(self.zero_like(y), y)
+        pass

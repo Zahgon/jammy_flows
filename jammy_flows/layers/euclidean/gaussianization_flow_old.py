@@ -21,27 +21,7 @@ import pylab
 def generate_log_function_bounded_in_logspace(min_val_normal_space=1, max_val_normal_space=10, center_around_zero=False):
     
     ## min and max values are in normal space -> must be positive
-    assert(min_val_normal_space > 0)
-
-    ln_max=numpy.log(max_val_normal_space)
-    ln_min=numpy.log(min_val_normal_space)
-
-    ## this shift makes the function equivalent to a normal exponential for small values
-    center_val=ln_max
-
-    ## can also center around zero (it will be centered in exp space, not in log space)
-    if(center_around_zero==False):
-        center_val=0.0
-
-    def f(x):
-
-        res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-x+center_val).unsqueeze(-1)], dim=-1)
-
-        first_term=ln_max-torch.logsumexp(res, dim=-1, keepdim=True)
-
-        return torch.logsumexp( torch.cat([first_term, torch.ones_like(first_term)*ln_min], dim=-1), dim=-1)
-
-    return f
+    pass
 
 
 class gf_block_old(euclidean_base.euclidean_base):
@@ -207,20 +187,12 @@ class gf_block_old(euclidean_base.euclidean_base):
 
                     def exp_like_fn(x):
 
-                        res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-torch.clamp(x, min=self.log_width_min_to_clamp, max=self.log_width_max_to_clamp)+ln_hs_max).unsqueeze(-1)], dim=-1)
-
-                        first_term=ln_hs_max-torch.logsumexp(res, dim=-1, keepdim=True)
-
-                        return torch.logsumexp( torch.cat([first_term, torch.ones_like(first_term)*ln_hs_min], dim=-1), dim=-1)
+                        pass
 
                 else:
                     def exp_like_fn(x):
 
-                        res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-x+ln_hs_max).unsqueeze(-1)], dim=-1)
-
-                        first_term=ln_hs_max-torch.logsumexp(res, dim=-1, keepdim=True)
-
-                        return torch.logsumexp( torch.cat([first_term, torch.ones_like(first_term)*ln_hs_min], dim=-1), dim=-1)
+                        pass
 
                 self.exp_like_function_log=exp_like_fn
 
@@ -376,21 +348,12 @@ class gf_block_old(euclidean_base.euclidean_base):
 
     def logistic_kernel_pdf(self, x, datapoints, log_widths,log_norms, skew_exponents, skew_signs):
         
-        log_pdf=self.logistic_kernel_log_pdf(x,datapoints,log_widths,log_norms, skew_exponents, skew_signs)
-        
-        pdf = torch.exp(log_pdf)
-
-
-        return pdf
+        pass
 
     def logistic_kernel_cdf(self, x, datapoints, log_widths,log_norms, skew_exponents,skew_signs):
         # Using bandwidth formula
 
-        log_cdf=self.logistic_kernel_log_cdf(x,datapoints,log_widths,log_norms, skew_exponents, skew_signs)
-        
-        cdf = torch.exp(log_cdf)
-
-        return cdf
+        pass
 
 
     def compute_householder_matrix(self, vs, device=torch.device("cpu")):
@@ -610,8 +573,7 @@ class gf_block_old(euclidean_base.euclidean_base):
                 return return_derivs
 
         """
-
-        return torch.exp(self.sigmoid_inv_error_pass_log_derivative(x,datapoints, log_widths,log_norms, skew_exponents, skew_signs))
+        pass
 
     def sigmoid_inv_error_pass_log_derivative(self, x, datapoints, log_widths, log_norms, skew_exponents, skew_signs):
 
@@ -958,46 +920,7 @@ class gf_block_old(euclidean_base.euclidean_base):
     def _obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 
 
 
-        extra_input_counter=0
-
-        if self.use_householder:
-            this_vs=self.vs.reshape(1,-1)
-          
-            if(extra_inputs is not None):
-                this_vs=this_vs+extra_inputs[:,:self.num_householder_params]
-
-                extra_input_counter+=self.num_householder_params
-            
-            param_dict[extra_prefix+"vs"]=this_vs.data
-
-        ## reshape as 2d tensor
-        this_datapoints=self.datapoints.reshape(1,-1)
-        this_hs=self.log_hs.reshape(1,-1)
-        this_log_norms=self.log_kde_weights.reshape(1,-1)
-        this_skew_exponents=self.skew_exponents.reshape(1,-1)
-
-        if(extra_inputs is not None):
-            
-            this_datapoints=this_datapoints+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_datapoints]
-            extra_input_counter+=self.num_params_datapoints
-
-            this_hs=this_hs+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_datapoints]
-            extra_input_counter+=self.num_params_datapoints
-
-            if(self.fit_normalization):
-                this_log_norms=this_log_norms+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_datapoints]
-
-            if(self.add_skewness):
-                this_log_exponents=this_log_norms+extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_datapoints]
-
-        param_dict[extra_prefix+"means"]=this_datapoints.data
-        param_dict[extra_prefix+"log_widths"]=this_hs.data
-
-        if(self.fit_normalization):
-            param_dict[extra_prefix+"log_norms"]=this_log_norms.data
-
-        if(self.add_skewness):
-            param_dict[extra_prefix+"exponents"]=this_skew_exponents.data
+        pass
 
 
 ## transformations
@@ -1010,18 +933,7 @@ def get_loss_fn(target_matrix, num_householder_iter=-1):
 
     def compute_matching_distance(a):
 
-        gblock=gf_block_old(dim, num_householder_iter=num_householder_iter)
-
-        hh_pars=torch.from_numpy(numpy.reshape(a, gblock.vs.shape))
-        mat=gblock.compute_householder_matrix(hh_pars).squeeze(0).detach().numpy()
-
-        test_vec=numpy.ones(dim)
-        test_vec/=numpy.sqrt((test_vec**2).sum())
-
-        v1=numpy.matmul(mat,test_vec)
-        v2=numpy.matmul(target_matrix,test_vec)
-
-        return -(v1*v2).sum()
+        pass
 
     return compute_matching_distance
 
@@ -1031,185 +943,7 @@ def find_init_pars_of_chained_gf_blocks_old(layer_list, data):
     ## given an input *data_inits*, this function tries to initialize the gf block parameters
     ## to best match the data intis
     
-    cur_data=data
-
-    """
-    cur_data[:,0]*=0.05
-
-    cx=numpy.cos(0.8)
-    cy=numpy.sin(0.8)
-
-    rotation_matrix=torch.Tensor([[cx,-cy],[cy,cx]]).unsqueeze(0).type_as(data)
-    rotation_matrix=rotation_matrix.repeat(cur_data.shape[0], 1,1)
-
-    cur_data=torch.bmm(rotation_matrix, cur_data.unsqueeze(-1)).squeeze(-1)
-
-    cur_data[:,0]+=100.0
-    """
-    dim=data.shape[1]
-
-    all_layers_params=[]
-
-    with torch.no_grad():
-        ## traverse layers in reversed order
-        for layer_ind, cur_layer in enumerate(layer_list[::-1]):
-
-            ## param order .. householder / datapoints / width / normaliaztion
-            param_list=[]
-            """
-            fig=pylab.figure()
-
-            xs=cur_data[:,0]
-            ys=cur_data[:,1]
-
-            pylab.plot(xs,ys, color="k", lw=0.0, marker="o", ms=3.0)
-            exact_normal_pts=numpy.random.normal(size=cur_data.shape)
-            pylab.plot(exact_normal_pts[:,0], exact_normal_pts[:,1], color="red", lw=.0, marker="o", ms=3.0)
-            pylab.savefig("layer_large_%s_%d.png" % (name, layer_ind))
-
-            pylab.gca().set_xlim(-4,4)
-            pylab.gca().set_ylim(-4,4)
-
-            pylab.savefig("layer_small_%s_%d.png" % (name, layer_ind))
-            """
-            ## subtract means first if necessary
-
-            if(cur_layer.model_offset):
-
-                means=cur_data.mean(axis=0,keepdim=True)
-               
-                param_list.append(means.squeeze(0))
-
-                cur_data=cur_data-means
-
-            if(cur_layer.use_householder):
-
-                ## find householder params that correspond to orthogonal transformation of svd of X^T*X (PCA data matrix) if low dimensionality
-                this_vs=0
-
-                ## USE PCA for first layer to get major correlation out of the way
-                if(cur_layer.dimension<30 and layer_ind==0):
-
-                    data_matrix=torch.matmul(cur_data.T, cur_data)
-
-                    evalues, evecs=scipy.linalg.eig(data_matrix)
-
-                    l, sigma, r=scipy.linalg.svd(data_matrix)
-                    
-                    loss_fn=get_loss_fn(r, num_householder_iter=cur_layer.householder_iter)
-
-                    start_vec=numpy.random.normal(size=dim*dim)
-
-                    ## fit a matrix via householder parametrization such that it fits the target orthogonal matrix V^* from SVD of X^T*X (PCA data Matrix)
-                    res=minimize(loss_fn, start_vec)
-
-                    param_list.append(torch.from_numpy(res["x"]))
-                    this_vs=torch.from_numpy(res["x"])
-                    
-                else:
-
-                    this_vs=torch.randn(cur_layer.dimension*cur_layer.householder_iter)
-                    param_list.append(this_vs)
-
-                gblock=gf_block_old(dim, num_householder_iter=cur_layer.householder_iter)
-
-                hh_pars=this_vs.reshape(gblock.vs.shape)
-                rotation_matrix=gblock.compute_householder_matrix(hh_pars)
-                rotation_matrix=rotation_matrix.repeat(cur_data.shape[0], 1,1)
-                ## inverted matrix
-                cur_data = torch.bmm(rotation_matrix.permute(0,2,1), cur_data.unsqueeze(-1)).squeeze(-1)
-
-     
-            num_kde=cur_layer.num_kde
-
-            assert(num_kde<100)
-            #percentiles_to_use=numpy.linspace(0,100,num_kde+2)[1:-1]
-            ## use all percentiles for KDE
-            percentiles_to_use=numpy.linspace(0,100,num_kde)#[1:-1]
-            percentiles=torch.from_numpy(numpy.percentile(cur_data.detach().numpy(), percentiles_to_use, axis=0))
-
-         
-            ## add means
-            param_list.append(percentiles.flatten())
-            
-
-            #pts=numpy.linspace(-20,20,200)
-            #x, datapoints, log_widths,log_norms
-
-         
-            quarter_diffs=percentiles[1:,:]-percentiles[:-1,:]
-            min_perc_diff=quarter_diffs.min(axis=0, keepdim=True)[0]
-
-        
-            ## this seems to be optimized settings for num_kde=20
-            bw=numpy.log(min_perc_diff*1.5)
-            bw=torch.ones_like(percentiles[None,:,:])*bw
-
-           
-            flattened_bw=bw.flatten()
-            #############
-            """
-            fig=pylab.figure()
-
-            for x in cur_data:
-                pylab.gca().axvline(x[0],color="black")
-            log_yvals=cur_layer.logistic_kernel_log_pdf(torch.from_numpy(pts)[:,None], percentiles[None,:,0:1], bw[:,:,0:1], torch.ones_like(percentiles[None,:,0:1]))
-            yvals=log_yvals.exp().detach().numpy()
-            pylab.gca().plot(pts, yvals, color="green")
-
-            pylab.savefig("test_kde_0.png")
-
-
-            fig=pylab.figure()
-
-            for x in cur_data:
-                pylab.gca().axvline(x[1],color="black")
-            log_yvals=cur_layer.logistic_kernel_log_pdf(torch.from_numpy(pts)[:,None], percentiles[None,:,1:2], bw[:,:,1:2], torch.ones_like(percentiles[None,:,1:2]))
-            yvals=log_yvals.exp().detach().numpy()
-            pylab.gca().plot(pts, yvals, color="green")
-
-            pylab.savefig("test_kde_1.png")
-
-            print("CUR PARAMS", param_list)
-            ##########
-
-            """
-            
-            param_list.append(torch.flatten(bw))
-
-
-            ## widths
-
-            if(cur_layer.fit_normalization):
-
-                ## norms
-
-                param_list.append(torch.ones_like(flattened_bw))
-
-            this_skewness_exponent=1.0
-            this_skewness_signs=1.0
-            if(cur_layer.add_skewness):
-
-
-                ## store zeros (log_exponents) in params
-                param_list.append(torch.zeros_like(flattened_bw))
-
-                this_skewness_exponent=cur_layer.exponent_regulator(torch.zeros_like(bw)).exp()
-                this_skewness_signs=cur_layer.skew_signs
-
-            all_layers_params.append(torch.cat(param_list))
-
-            ## transform params according to CDF_norm^-1(CDF_KDE)
-
-            #gblock=gf_block(dim, num_householder_iter=cur_layer.householder_iter)
-            cur_data=cur_layer.sigmoid_inv_error_pass(cur_data, percentiles[None,:,:], bw, torch.ones_like(bw), this_skewness_exponent, this_skewness_signs)
-
-
-
-
-    all_layers_params=torch.cat(all_layers_params[::-1])
-
-    return all_layers_params
+    pass
 
 
 

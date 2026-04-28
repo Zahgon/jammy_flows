@@ -75,7 +75,7 @@ class rational_quadratic_spline(interval_base.interval_base):
                  smooth_second_derivative=0,
                  restrict_max_min_width_height_ratio=-1.0):
         """
-        Rational-quadartic spline layer: Symbol “r"
+        Rational-quadartic spline layer: Symbol â€œr"
 
         Also known as Neural spline flows - https://arxiv.org/abs/1906.04032. Adapted code from pyro implementation.
         
@@ -343,26 +343,7 @@ class rational_quadratic_spline(interval_base.interval_base):
 
     def _obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 
 
-        extra_input_counter=0
-
-        if(self.use_permanent_parameters):
-            widths=self.rel_log_widths
-            heights=self.rel_log_heights
-            if(self.num_derivative_params>0):
-                derivatives=self.rel_log_derivatives
-        else:
-            assert(extra_inputs is not None)
-            
-            widths=extra_inputs[:,:self.num_basis_functions]
-            heights=extra_inputs[:,self.num_basis_functions:2*self.num_basis_functions]
-            if(self.num_derivative_params>0):
-                derivatives=extra_inputs[:,2*self.num_basis_functions:]
-
-        param_dict[extra_prefix+"widths"]=widths
-        param_dict[extra_prefix+"heights"]=heights
-
-        if(self.smooth_second_derivative==0):
-            param_dict[extra_prefix+"derivatives"]=derivatives
+        pass
 
     
        

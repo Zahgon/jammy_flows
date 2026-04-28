@@ -107,11 +107,11 @@ class euclidean_base(layer_base.layer_base):
         return x
 
     def _embedding_conditional_return_num(self): 
-        return self.dimension
+        pass
 
     def _get_layer_base_dimension(self):
         
-        return self.dimension   
+        pass
 
     def transform_target_space(self, x, log_det=0.0, transform_from="default", transform_to="embedding"):
         
@@ -137,15 +137,7 @@ class euclidean_base(layer_base.layer_base):
         """
 
         """
-        if(self.model_offset):
-            if(extra_inputs is not None):
-                param_dict["offset"]=extra_inputs[:,:self.dimension]
-                self._obtain_layer_param_structure(param_dict, extra_inputs=extra_inputs[:,self.dimension:], previous_x=previous_x, extra_prefix=extra_prefix)
-            else:
-                param_dict["offset"]=self.offsets.data
-                self._obtain_layer_param_structure(param_dict, extra_inputs=None, previous_x=previous_x, extra_prefix=extra_prefix)
-        else:
-            self._obtain_layer_param_structure(param_dict, extra_inputs=extra_inputs, previous_x=previous_x, extra_prefix=extra_prefix)
+        pass
 
 
     def _obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 

@@ -23,28 +23,7 @@ import pylab
 def generate_log_function_bounded_in_logspace(min_val_normal_space=1, max_val_normal_space=10, center=False):
     
     ## min and max values are in normal space -> must be positive
-    assert(min_val_normal_space > 0)
-
-    ln_max=numpy.log(max_val_normal_space)
-    ln_min=numpy.log(min_val_normal_space)
-
-    ## this shift makes the function equivalent to a normal exponential for small values
-    center_val=ln_max
-
-    ## can also center around zero (it will be centered in exp space, not in log space)
-    if(center==False):
-        center_val=0.0
-
-
-    def f(x):
-
-        res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-x+center_val).unsqueeze(-1)], dim=-1)
-
-        first_term=ln_max-torch.logsumexp(res, dim=-1, keepdim=True)
-
-        return torch.logsumexp( torch.cat([first_term, torch.ones_like(first_term)*ln_min], dim=-1), dim=-1)
-
-    return f
+    pass
 
 
 class gf_block(euclidean_base.euclidean_base):
@@ -303,11 +282,7 @@ class gf_block(euclidean_base.euclidean_base):
 
                         def exp_like_fn(x):
 
-                            res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-torch.clamp(x, min=self.log_width_min_to_clamp, max=self.log_width_max_to_clamp)+ln_width_max).unsqueeze(-1)], dim=-1)
-
-                            first_term=ln_width_max-torch.logsumexp(res, dim=-1, keepdim=True)
-
-                            return torch.logsumexp( torch.cat([first_term, torch.ones_like(first_term)*ln_width_min], dim=-1), dim=-1)
+                            pass
 
                     else:
 
@@ -685,13 +660,7 @@ class gf_block(euclidean_base.euclidean_base):
         """
         Used by Newton iterations (requires derivative instead of log-derivative).
         """
-        log_cdf, log_sf, log_pdf=self.logistic_kernel_log_pdf_quantities(x, datapoints,log_widths,log_norms, skew_exponents, skew_signs, calculate_pdf=True)  
-
-        new_val=self.sigmoid_inv_error_pass_given_cdf_sf(log_cdf, log_sf)
-
-        log_deriv=self.sigmoid_inv_error_pass_log_derivative_given_cdf_sf(log_cdf, log_sf, log_pdf)
-
-        return new_val, log_deriv.exp()
+        pass
 
     
 
@@ -1223,113 +1192,7 @@ class gf_block(euclidean_base.euclidean_base):
         """ 
         Debugging function that puts current flow parameters along with their name into "param_dict".
         """
-
-        extra_input_counter=0
-
-        ### rotation stuff
-        if(self.rotation_mode=="triangular_combination"):
-            if(self.dimension>1):
-                if(extra_inputs is None):
-                    param_dict[extra_prefix+"trianglepars"]=self.triangle_trafo_pars.data
-                else:
-                    param_dict[extra_prefix+"trianglepars"]=extra_inputs[:,:self.num_triangle_params]
-
-                    extra_input_counter+=self.num_triangle_params
-        elif(self.rotation_mode=="householder"):
-            if self.use_householder:
-                this_vs=self.vs.reshape(1, -1)
-              
-                if(extra_inputs is not None):
-                    this_vs=this_vs+extra_inputs[:,:self.num_householder_params]
-
-                    extra_input_counter+=self.num_householder_params
-                
-                param_dict[extra_prefix+"vs"]=this_vs.data
-
-                this_vs=torch.reshape(this_vs, [-1, self.dimension, self.dimension])
-
-                this_vs_determinant=torch.det(self.compute_householder_matrix(this_vs))
-
-                param_dict[extra_prefix+"hh_det"]=this_vs_determinant
-
-        elif(self.rotation_mode=="angles"):
-            if(self.dimension>1):
-                if(extra_inputs is None):
-                    param_dict[extra_prefix+"anglepars"]=self.angle_pars.data
-                else:
-                    param_dict[extra_prefix+"anglepars"]=extra_inputs[:,:self.num_angle_pars]
-
-                    extra_input_counter+=self.num_angle_pars
-        elif(self.rotation_mode=="cayley"):
-            if(self.dimension>1):
-                if(extra_inputs is None):
-                    param_dict[extra_prefix+"cayleypars"]=self.cayley_pars.data
-                else:
-                    param_dict[extra_prefix+"cayleypars"]=extra_inputs[:,:self.num_cayley_pars]
-
-                    extra_input_counter+=self.num_cayley_pars
-
-        if(self.nonlinear_stretch_type=="classic"):
-            ### non rotation stuff
-            kde_log_skew_exponents=self.kde_log_skew_exponents
-
-            if(extra_inputs is None):
-
-                kde_means=self.kde_means
-                kde_log_widths=self.kde_log_widths
-                kde_log_weights=self.kde_log_weights
-                
-            else:
-                ## skipping householder params
-                
-
-                kde_means=extra_inputs[:,extra_input_counter:extra_input_counter+self.total_param_num_means].reshape(-1, self.num_kde-self.center_mean, self.dimension)
-                extra_input_counter+=self.total_param_num_means
-
-                kde_log_widths=extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_datapoints].reshape(-1, self.num_kde, self.dimension)
-                extra_input_counter+=self.num_params_datapoints
-
-                if(self.fit_normalization):
-                    kde_log_weights=extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_datapoints].reshape(-1,self.num_kde, self.dimension)
-                    extra_input_counter+=self.num_params_datapoints
-
-                if(self.add_skewness):
-
-                    kde_log_skew_exponents=extra_inputs[:,extra_input_counter:extra_input_counter+self.num_params_datapoints].reshape(-1,self.num_kde, self.dimension)
-            
-
-            param_dict[extra_prefix+"means"]=kde_means.data
-            param_dict[extra_prefix+"log_widths"]=kde_log_widths.data
-
-            if(self.fit_normalization):
-                param_dict[extra_prefix+"log_norms"]=kde_log_weights.data
-
-            if(self.add_skewness):
-                param_dict[extra_prefix+"exponents"]=kde_log_skew_exponents.data
-        else:
-
-            if(extra_inputs is None):
-
-                log_widths=self.log_widths
-                log_heights=self.log_heights
-                log_derivatives=self.log_derivatives
-                boundary_points=self.boundary_points
-            else:
-                log_widths=extra_inputs[:,extra_input_counter:extra_input_counter+self.dimension*self.num_kde].reshape(-1, self.dimension, self.num_kde)
-                extra_input_counter+=self.dimension*self.num_kde
-
-                log_heights=extra_inputs[:,extra_input_counter:extra_input_counter+self.dimension*self.num_kde].reshape(-1, self.dimension, self.num_kde)
-                extra_input_counter+=self.dimension*self.num_kde
-
-                log_derivatives=extra_inputs[:,extra_input_counter:extra_input_counter+self.dimension*(self.num_kde+1)].reshape(-1, self.dimension, self.num_kde+1)
-                extra_input_counter+=self.dimension*(self.num_kde+1)
-
-                boundary_points=extra_inputs[:,extra_input_counter:extra_input_counter+self.dimension*4].reshape(-1, self.dimension, 4)
-            
-            param_dict[extra_prefix+"log_widths"]=log_widths.data
-            param_dict[extra_prefix+"log_heights"]=log_heights.data
-            param_dict[extra_prefix+"log_derivatives"]=log_derivatives.data
-            param_dict[extra_prefix+"boundary_points"]=boundary_points.data
+        pass
 
 
 

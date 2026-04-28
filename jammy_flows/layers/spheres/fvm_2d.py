@@ -563,42 +563,4 @@ class fisher_von_mises_2d(sphere_base.sphere_base):
         """ 
         Implemented by Euclidean sublayers.
         """
-
-        vertical_params=None
-        circular_params=None
-        correlated_params=None
-
-        if(extra_inputs is not None):
-            loglike_kappa=extra_inputs[:,:1]
-
-            if(self.add_correlated_rq_spline_flow):
-                correlated_params=extra_inputs[:,1:self.total_num_correlated_params+1]
-            else:
-                if(self.add_vertical_rq_spline_flow):
-                    vertical_params=extra_inputs[:,1:self.total_num_vertical_params+1]
-                if(self.add_circular_rq_spline_flow):
-                    circular_params=extra_inputs[:,1+self.total_num_vertical_params:self.total_num_circular_params+self.total_num_vertical_params+1]
-
-        else:
-            loglike_kappa=self.loglike_kappa
-            
-            if(self.add_correlated_rq_spline_flow):
-                correlated_params=self.correlated_flow_params
-            else:
-                if(self.add_vertical_rq_spline_flow):
-                    vertical_params=self.vertical_flow_params
-                if(self.add_circular_rq_spline_flow):
-                    circular_params=self.circular_flow_params
-
-        param_dict[extra_prefix+"loglike_kappa"]=loglike_kappa.data
-
-        if(self.add_correlated_rq_spline_flow):
-            param_dict[extra_prefix+"correlated_params"]=correlated_params.data
-        else:
-            if(self.add_vertical_rq_spline_flow):
-
-                param_dict[extra_prefix+"vertical_params"]=vertical_params.data
-
-            if(self.add_circular_rq_spline_flow):
-
-                param_dict[extra_prefix+"circular_params"]=circular_params.data
+        pass

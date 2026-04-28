@@ -87,4 +87,4 @@ class spherical_do_nothing(sphere_base.sphere_base):
 
     def _obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 
         # do nothing
-        return
+        pass

@@ -17,8 +17,7 @@ class Artanh(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        input, = ctx.saved_tensors
-        return grad_output / (1 - input ** 2)
+        pass
 
 
 class Arsinh(torch.autograd.Function):
@@ -31,8 +30,7 @@ class Arsinh(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        input, = ctx.saved_tensors
-        return grad_output / (1 + input ** 2) ** 0.5
+        pass
 
 
 class Acosh(torch.autograd.Function):
@@ -46,10 +44,7 @@ class Acosh(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, g):
-        z, = ctx.saved_tensors
-        z.data.clamp(min=EPS[z.dtype])
-        z = g / z
-        return z, None
+        pass
 
 
 artanh = Artanh.apply
@@ -65,8 +60,7 @@ sinh_bounds = {torch.float32: 85, torch.float64: 500}
 
 
 def cosh(x):
-    x.data.clamp_(max=cosh_bounds[x.dtype])
-    return torch.cosh(x)
+    pass
 
 
 def sinh(x):
@@ -93,10 +87,7 @@ class Sinhdiv(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, g):
-        x, = ctx.saved_tensors
-        y = (x * cosh(x) - sinh(x)) / x.pow(2)
-        y_stable = torch.zeros_like(x)
-        return torch.where(x < EPS[x.dtype], y_stable, y) * g
+        pass
 
 
 sinhdiv = Sinhdiv.apply
@@ -113,10 +104,7 @@ class Divsinh(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, g):
-        x, = ctx.saved_tensors
-        y = (1 - x * cosh(x) / sinh(x)) / sinh(x)
-        y_stable = torch.zeros_like(x)
-        return torch.where(x < EPS[x.dtype], y_stable, y) * g
+        pass
 
 
 divsinh = Divsinh.apply
@@ -133,12 +121,7 @@ class Sindiv(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, g):
-        x, = ctx.saved_tensors
-        y = (x * torch.cos(x) - torch.sin(x)) / x.pow(2)
-        y_stable = torch.zeros_like(x)
-        # if torch.isnan(torch.where(x > 1 - EPS[x.dtype], y_stable, y)).any():
-        #     raise ValueError("1")
-        return torch.where(x.abs() < EPS[x.dtype], y_stable, y) * g
+        pass
 
 
 sindiv = Sindiv.apply
@@ -155,12 +138,7 @@ class Divsin(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, g):
-        x, = ctx.saved_tensors
-        y = (1 - x * torch.cos(x) / torch.sin(x)) / torch.sin(x)
-        y_stable = torch.zeros_like(x)
-        # if torch.isnan(torch.where(x > 1 - EPS[x.dtype], y_stable, y)).any():
-        #     raise ValueError("2")
-        return torch.where(x.abs() < EPS[x.dtype], y_stable, y) * g
+        pass
 
 
 divsin = Divsin.apply
@@ -175,9 +153,7 @@ class LeakyClamp(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        mask, = ctx.saved_tensors
-        mask = mask.type_as(grad_output)
-        return grad_output * mask + grad_output * (1 - mask) * EPS[grad_output.dtype], None, None
+        pass
 
 
 def clamp(x, min=float("-inf"), max=float("+inf")):
@@ -187,20 +163,11 @@ def clamp(x, min=float("-inf"), max=float("+inf")):
 def logsinh(x):
     # torch.log(sinh(x))
     # return x + torch.log(clamp(1. - torch.exp(-2. * x), min=eps)) - ln_2
-    x_exp = x.unsqueeze(dim=-1)
-    signs = torch.cat((torch.ones_like(x_exp), -torch.ones_like(x_exp)), dim=-1)
-    value = torch.cat((torch.zeros_like(x_exp), -2. * x_exp), dim=-1)
-    return x + logsumexp_signs(value, dim=-1, signs=signs) - math.log(2)
+    pass
 
 
 def logsumexp_signs(value, dim=0, keepdim=False, signs=None):
-    if signs is None:
-        signs = torch.ones_like(value)
-    m, _ = torch.max(value, dim=dim, keepdim=True)
-    value0 = value - m
-    if keepdim is False:
-        m = m.squeeze(dim)
-    return m + torch.log(clamp(torch.sum(signs * torch.exp(value0), dim=dim, keepdim=keepdim), min=EPS[value.dtype]))
+    pass
 
 
 class MultiInputSequential(nn.Sequential):
@@ -227,23 +194,4 @@ def check_mkdir(path, increment=False):
     warning if it exists. When 'increment' is true, it creates a directory
     nonetheless by incrementing an integer at its end.
     """
-    if not os.path.isdir(path):
-        os.makedirs(path)
-    else:
-        if increment:
-            trailing_int = 0
-            while os.path.isdir(path):
-                basename = os.path.basename(path)
-                split = basename.split('_')
-                if split[-1].isdigit():
-                    basename = '_'.join(split[:-1])
-                path = os.path.join(
-                        os.path.dirname(path),
-                        basename + '_{}'.format(trailing_int))
-                trailing_int += 1
-            os.makedirs(path)
-            print('Created the directory (%s) instead', path)
-        else:
-            print('The given path already exists (%s)', path)
-
-    return path
+    pass

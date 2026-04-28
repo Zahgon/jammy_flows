@@ -22,10 +22,7 @@ class FirstJacobianScalar(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, g):
-        x, = ctx.saved_tensors
-        y = (-3 * (1 - x.pow(2)).sqrt() * x + 2 * x.pow(2) * torch.acos(x) + torch.acos(x)) / (1 - x.pow(2)).pow(2.5)
-        y_limit = torch.ones_like(x) * 4/15
-        return torch.where(x > 1 - EPS[x.dtype], y_limit, y) * g
+        pass
 
 
 firstjacscalar = FirstJacobianScalar.apply
@@ -42,15 +39,13 @@ class Sphere(Manifold):
         return x
 
     def zero_vec(self, *shape, out=None):
-        return torch.zeros(*shape, out=out)
+        pass
 
     def zero_like(self, x):
-        y = torch.zeros_like(x)
-        y[..., 0] = -1
-        return y
+        pass
 
     def zero_vec_like(self, x):
-        return torch.zeros_like(x)
+        pass
 
     def inner(self, x, u, v, keepdim=False):
         return (u * v).sum(dim=-1, keepdim=keepdim)
@@ -85,12 +80,7 @@ class Sphere(Manifold):
 
 
     def dist(self, x, y, squared=False, keepdim=False):
-        inner = self.inner(None, x, y, keepdim=keepdim)
-        inner.data.clamp_(min=-1 + EPS[x.dtype]**2, max=1 - EPS[x.dtype]**2)
-        sq_dist = torch.acos(inner)
-        sq_dist.data.clamp_(min=EPS[x.dtype])
-
-        return sq_dist.pow(2) if squared else sq_dist
+        pass
 
     def rand(self, *shape, out=None, ir=1e-2):
         x = self.zero(*shape, out=out)
@@ -98,15 +88,10 @@ class Sphere(Manifold):
         return self.retr(x, u)
 
     def rand_uniform(self, *shape, out=None):
-        return self.projx(
-                torch.randn(*shape, out=out), inplace=True)
+        pass
 
     def rand_ball(self, *shape, out=None):
-        xs_unif = self.rand_uniform(*shape, out=out)
-        rs = torch.rand(*shape[0]).pow_(1 / (self.dim + 1))
-        # rs = rs.reshape(*shape, *((1, ) * len(self.shape)))
-        xs_ball = xs_unif.mul_(rs)
-        return xs_ball
+        pass
 
     def randvec(self, x, norm=1):
         u = torch.randn(x.shape, out=torch.empty_like(x))
@@ -115,30 +100,22 @@ class Sphere(Manifold):
         return u
 
     def transp(self, x, y, u):
-        yu = torch.sum(y * u, dim=-1, keepdim=True)
-        xy = torch.sum(x * y, dim=-1, keepdim=True)
-        return u - yu/(1 + xy) * (x + y)
+        pass
 
     def __str__(self):
         return "Sphere"
     
     def sh_to_dim(self, sh):
-        if hasattr(sh, '__iter__'):
-            return sh[-1] - 1
-        else:
-            return sh - 1
+        pass
 
     def dim_to_sh(self, dim):
-        if hasattr(dim, '__iter__'):
-            return dim[-1] + 1
-        else:
-            return dim + 1
+        pass
 
     def squeeze_tangent(self, x):
-        return x[..., 1:]
+        pass
 
     def unsqueeze_tangent(self, x):
-        return torch.cat((torch.zeros_like(x[..., :1]), x), dim=-1)  
+        pass
 
     def logdetexp(self, x, u):
         norm_u = u.norm(dim=-1)

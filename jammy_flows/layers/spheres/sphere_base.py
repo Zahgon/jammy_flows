@@ -659,19 +659,7 @@ class sphere_base(layer_base.layer_base):
 
     def obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 
 
-        if(extra_inputs is None):
-            self._obtain_layer_param_structure(param_dict, previous_x=previous_x, extra_prefix=extra_prefix)
-        else:
-            self._obtain_layer_param_structure(param_dict, extra_inputs=extra_inputs[:, self.num_householder_params:], previous_x=previous_x, extra_prefix=extra_prefix)
-
-        if(self.add_rotation):
-            
-            if(extra_inputs is not None):
-                
-                hh_pars=extra_inputs[:,:self.num_householder_params]
-            else:
-                hh_pars=self.householder_params
-            param_dict[extra_prefix+"householder"]=hh_pars
+        pass
 
     def _obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 
         """ 
@@ -694,7 +682,7 @@ class sphere_base(layer_base.layer_base):
         return x
 
     def _embedding_conditional_return_num(self): 
-        return self.dimension+1
+        pass
 
     def transform_target_space(self, x, log_det=0.0, transform_from="default", transform_to="embedding"):
         
@@ -747,12 +735,7 @@ class sphere_base(layer_base.layer_base):
         """ 
         Usually this is just the dimension .. if we work in embedding space and do not project, base space is actually dim+1
         """
-
-        if(self.always_parametrize_in_embedding_space==True and self.euclidean_to_sphere_as_first==False):
-            return self.dimension+1
-
-        else:
-            return self.dimension
+        pass
 
     ##########################################################
     ## Functions to override 

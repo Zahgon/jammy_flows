@@ -107,16 +107,7 @@ def get_loss_fn(target_matrix, num_householder_iter=-1):
 
     def compute_matching_distance(a):
 
-        hh_pars=torch.from_numpy(numpy.reshape(a, used_shape))
-        mat=gblock.compute_householder_matrix(hh_pars).squeeze(0).detach().numpy()
-
-        test_vec=numpy.ones(dim)
-        test_vec/=numpy.sqrt((test_vec**2).sum())
-
-        v1=numpy.matmul(mat,test_vec)
-        v2=numpy.matmul(target_matrix,test_vec)
-
-        return -(v1*v2).sum()
+        pass
 
     return compute_matching_distance
 
@@ -128,27 +119,7 @@ def get_loss_fn_mvn(target_matrix, cov_type):
 
     def compute_matching_distance(a):
        
-        test_block=multivariate_normal.mvn_block(dim,cov_type=cov_type)
-
-        pars=test_block._obtain_usable_flow_params(a, cov_type, extra_inputs=torch.from_numpy(a).unsqueeze(0))
-
-        lower_trig, _=matrix_fns.obtain_lower_triangular_matrix_and_logdet(dim, single_log_diagonal_entry=pars[0], log_diagonal_entries=pars[1], lower_triangular_entries=pars[2], cov_type=cov_type)
-
-        lower_trig=lower_trig[0].numpy()
-
-        predicted_matrix=numpy.matmul(lower_trig, lower_trig.T)
-        
-        ## it seems when the target data has larger variance than the unit gaussian, it is much faster to just take the reverse KL    
-        #inverse_predicted=scipy.linalg.pinv(predicted_matrix)
-        #forward_kl=0.5*(numpy.trace(numpy.matmul(inverse_predicted, target_matrix))+numpy.linalg.slogdet(predicted_matrix)[1]-numpy.linalg.slogdet(target_matrix)[1]-dim)
-
-        ## inverse
-
-        inverse_target=scipy.linalg.pinv(target_matrix)
-    
-        reverse_kl=0.5*(numpy.trace(numpy.matmul(inverse_target, predicted_matrix))-numpy.linalg.slogdet(predicted_matrix)[1]+numpy.linalg.slogdet(target_matrix)[1]-dim)
-
-        return reverse_kl
+        pass
         
     return compute_matching_distance
 
@@ -496,7 +467,7 @@ def recheck_sampling(pdf,
                 new_amortization_parameters=amortization_parameters[deviation_mask]
 
             if(sub_manifolds):
-                ## individual forw9oio98ko.p.,.,ö0ßm,ard functions (used in entropy calculation)
+                ## individual forw9oio98ko.p.,.,Ã¶0ÃŸm,ard functions (used in entropy calculation)
 
                 resampled_new_target, resampled_std_normal_samples, resampled_return_pdf, resampled_log_gauss_evals =pdf.all_layer_forward_individual_subdims_incl_sampling(new_cinput, num_deviations, failsafe_crosscheck_tolerance=failsafe_crosscheck_tolerance, force_embedding_coordinates=force_embedding_coordinates, force_intrinsic_coordinates=force_intrinsic_coordinates, dtype=dtype, device=device)
                 

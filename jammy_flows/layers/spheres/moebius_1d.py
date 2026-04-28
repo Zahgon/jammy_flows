@@ -272,13 +272,6 @@ class moebius(sphere_base.sphere_base):
         """ 
         Implemented by Euclidean sublayers.
         """
-
-        moebius_pars=self.moebius_pars
-        #this_num_params=self.num_basis_functions*self.num_omega_pars
-        if(extra_inputs is not None):
-         
-            moebius_pars=extra_inputs.reshape(-1, self.num_basis_functions, self.num_omega_pars)
-
-        param_dict[extra_prefix+"moebius"]=moebius_pars.data
+        pass
         
 

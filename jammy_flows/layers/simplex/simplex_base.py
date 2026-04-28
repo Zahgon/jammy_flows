@@ -231,7 +231,7 @@ class simplex_base(layer_base.layer_base):
         return x
 
     def _embedding_conditional_return_num(self): 
-        return self.dimension+1
+        pass
 
     def transform_target_space(self, x, log_det=0.0, transform_from="default", transform_to="embedding"):
         
@@ -284,12 +284,7 @@ class simplex_base(layer_base.layer_base):
         """ 
         Usually this is just the dimension .. if we work in embedding space and do not project, base space is actually dim+1
         """
-
-        if(self.always_parametrize_in_embedding_space==True and self.project_from_gauss_to_simplex==False):
-            return self.dimension+1
-
-        else:
-            return self.dimension
+        pass
 
     #############################################################################
 
@@ -308,7 +303,7 @@ class simplex_base(layer_base.layer_base):
 
     def obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 
         
-        self._obtain_layer_param_structure(param_dict, extra_inputs=extra_inputs, previous_x=previous_x, extra_prefix=extra_prefix)
+        pass
 
 
     def _obtain_layer_param_structure(self, param_dict, extra_inputs=None, previous_x=None, extra_prefix=""): 

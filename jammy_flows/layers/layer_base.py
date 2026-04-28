@@ -34,14 +34,14 @@ class layer_base(nn.Module):
         return torch.randn(self.total_param_num)
 
     def get_layer_embedded_target_dimension(self):
-        return self._embedding_conditional_return_num()
+        pass
 
     def get_layer_intrinsic_target_dimension(self):
-        return self.dimension
+        pass
 
     def get_layer_base_dimension(self):
         
-        return self._get_layer_base_dimension()
+        pass
 
    
 

@@ -261,118 +261,14 @@ class AmortizableMLP(nn.Module):
 
     def _fill_activations(self, mlp_def, input):
 
-        for ind in range(len(input)):
-
-            if(ind==(len(input)-1)):
-                mlp_def["activations"].append(lambda x: x)
-            else:
-                #print("nonlinear act ...........")
-                mlp_def["activations"].append(NONLINEARITIES[self.nonlinearity])
+        pass
 
     def _initialize_uv_structure(self, mlp_def):
         """
         Private method to initialize UV structure of MLPs and contained linear transformations.
         Adds additional information to the mlp_list or linear_highway MLP defs.
         """  
-        num_amortization_params=0
-
-        max_ranks=[]
-        used_ranks=[]
-
-        #print("MLP DEF ", mlp_def)
-
-        for ind in range(len(mlp_def["inputs"])):
-
-            max_ranks.append(min(mlp_def["inputs"][ind], mlp_def["outputs"][ind]))
-
-            if(mlp_def["low_rank_approximations"][ind]>0):
-                used_ranks.append(min(max_ranks[ind], mlp_def["low_rank_approximations"][ind]))
-            else:
-                if(mlp_def["svd_mode"]=="naive"):
-                    # append 0
-                    used_ranks.append(0)
-                else:
-                    ## smart mode just uses the max rank
-                    used_ranks.append(max_ranks[ind])
-
-            if(mlp_def["svd_mode"]=="naive"):
-                    
-                if(used_ranks[ind]>0):
-
-                    mlp_def["num_u_s"].append(used_ranks[ind]*mlp_def["outputs"][ind])
-                    mlp_def["num_v_s"].append(used_ranks[ind]*mlp_def["inputs"][ind])
-                    num_amortization_params+=(used_ranks[ind]*mlp_def["inputs"][ind]+used_ranks[ind]*mlp_def["outputs"][ind])
-                    
-                    mlp_def["full_weight_matrix_flags"].append(0)
-                else:
-
-                    mlp_def["num_u_s"].append(mlp_def["outputs"][ind]*mlp_def["inputs"][ind])
-                    mlp_def["num_v_s"].append(0)
-                    num_amortization_params+=(mlp_def["outputs"][ind]*mlp_def["inputs"][ind])
-                    
-                    mlp_def["full_weight_matrix_flags"].append(1)
-
-                
-            elif(mlp_def["svd_mode"]=="smart"):
-                ## smart mode takes a full matrix if the low-rank approximation has more parameters
-                
-                max_num_pars=(mlp_def["inputs"][ind]*mlp_def["outputs"][ind])
-
-                # smart flag = 0 -> standard low rank approximation for this matrix
-                if( ((used_ranks[ind]*(mlp_def["inputs"][ind]+mlp_def["outputs"][ind]) ) < max_num_pars) and (mlp_def["low_rank_approximations"][ind]>0) ):
-                    mlp_def["num_u_s"].append(used_ranks[ind]*mlp_def["outputs"][ind])
-                    mlp_def["num_v_s"].append(used_ranks[ind]*mlp_def["inputs"][ind])
-                    num_amortization_params+=(used_ranks[ind]*mlp_def["inputs"][ind]+used_ranks[ind]*mlp_def["outputs"][ind])
-                    mlp_def["full_weight_matrix_flags"].append(0)
-                else:
-                    # smart_flag = 1 -> full matrix (all parameters of the full matrix are stored in the *v* vector)
-                    mlp_def["num_u_s"].append(mlp_def["inputs"][ind]*mlp_def["outputs"][ind])
-                    mlp_def["num_v_s"].append(0)
-                    num_amortization_params+=(mlp_def["inputs"][ind]*mlp_def["outputs"][ind])
-                    mlp_def["full_weight_matrix_flags"].append(1)
-
-            elif(mlp_def["svd_mode"]=="explicit_svd"):
-
-                raise NotImplementedError()
-                """
-                mlp_def["num_u_s"].append(used_ranks[ind]*mlp_def["inputs"][ind])
-                mlp_def["num_v_s"].append(used_ranks[ind]*mlp_def["outputs"][ind])
-                mlp_def["sigmas"].append(used_ranks[ind])
-            
-                num_amortization_params+=(used_ranks[ind]*mlp_def["inputs"][ind]+used_ranks[ind]*mlp_def["outputs"][ind]+mlp_def["outputs"][ind]+used_ranks[ind])
-                """
-            else:
-                raise Exception("unknown svd mode", self.svd_mode)
-
-            
-            ## no activation in first mapping if full linear connection
-            ## this will allow for a full linear mapping between input and output
-            #if(ind==0 and full_linear_connection):
-            #    add_activation=False
-            
-            ## no activation in last mapping (first if len=1, i.e. no hidden layer)
-            if(ind==(len(mlp_def["inputs"])-1)):
-
-                #mlp_def["activations"].append(lambda x: x)
-
-                if(mlp_def["add_final_bias"]):
-                    mlp_def["num_b_s"].append(mlp_def["outputs"][ind])
-                else:
-                    mlp_def["num_b_s"].append(0)
-                #print("linear act ->>>>>>>>>")
-            else:
-                #print("nonlinear act ...........")
-                #mlp_def["activations"].append(NONLINEARITIES[self.nonlinearity])
-                mlp_def["num_b_s"].append(mlp_def["outputs"][ind])
-
-            num_amortization_params+=mlp_def["num_b_s"][-1]
-            
-            
-        mlp_def["max_ranks"]=max_ranks
-        mlp_def["used_ranks"]=used_ranks
-        mlp_def["num_params"]=num_amortization_params
-
-        return num_amortization_params
+        pass
 
     def obtain_default_init_tensor(self, fix_final_bias=None, prev_damping_factor=1000.0):
         """

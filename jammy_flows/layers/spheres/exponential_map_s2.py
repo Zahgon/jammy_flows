@@ -34,40 +34,12 @@ def generate_normalization_function(max_value=1.0,stretch_factor=10.0):
     """ 
     Generates a function that bounds the input to be smaller than *max_value*. The input is assumed to be positive.
     """
-   
-    def f(x):
-      
-        res=-torch.log(1.0+(numpy.exp(1.0)-1.0)*torch.exp(-x/stretch_factor))+max_value
-
-        return res
-
-    return f
+    pass
 
 def generate_log_function_bounded_in_logspace(min_val_normal_space=1, max_val_normal_space=10, center=False):
     
     ## min and max values are in normal space -> must be positive
-    assert(min_val_normal_space > 0)
-
-    ln_max=numpy.log(max_val_normal_space)
-    ln_min=numpy.log(min_val_normal_space)
-
-    ## this shift makes the function equivalent to a normal exponential for small values
-    center_val=ln_max
-
-    ## can also center around zero (it will be centered in exp space, not in log space)
-    if(center==False):
-        center_val=0.0
-
-
-    def f(x):
-
-        res=torch.cat([torch.zeros_like(x).unsqueeze(-1), (-x+center_val).unsqueeze(-1)], dim=-1)
-
-        first_term=ln_max-torch.logsumexp(res, dim=-1, keepdim=True)
-
-        return torch.logsumexp( torch.cat([first_term, torch.ones_like(first_term)*ln_min], dim=-1), dim=-1)
-
-    return f
+    pass
 
 
 
@@ -222,27 +194,7 @@ class exponential_map_s2(sphere_base.sphere_base):
     def basic_logarithmic_map(self, base, target):
         
 
-        assert(len(base.shape)==len(target.shape)), (base.shape, target.shape)
-      
-        alternative_base=torch.zeros_like(base)
-        alternative_base[:,0]=1.0
-
-        cos_alpha=(target*base).sum(axis=1,keepdims=True)
-        alternative_cos_alpha=(target*alternative_base).sum(axis=1,keepdims=True)
-
-        converged_mask=cos_alpha>=1
-
-        cos_alpha=torch.masked_scatter(input=cos_alpha, mask=converged_mask, source=alternative_cos_alpha[converged_mask])
-        alpha=torch.arccos(cos_alpha)
-        
-        used_base=torch.masked_scatter(input=base, mask=converged_mask, source=alternative_base[converged_mask[:,0]])
-
-        normalized_tangent_vec=(target-used_base*cos_alpha)/torch.sin(alpha)
-
-        ## set alphas to 0 where we are close
-        alpha=torch.masked_scatter(input=alpha, mask=converged_mask, source=torch.zeros_like(alternative_cos_alpha)[converged_mask])
-
-        return normalized_tangent_vec, alpha
+        pass
    
    
 
@@ -558,11 +510,4 @@ class exponential_map_s2(sphere_base.sphere_base):
         """ 
         Implemented by Euclidean sublayers.
         """
-
-        
-        if(extra_inputs is not None):
-            potential_pars=extra_inputs
-        else:
-            potential_pars=self.potential_pars
-
-        param_dict[extra_prefix+"potential_pars"]=potential_pars.data
+        pass
